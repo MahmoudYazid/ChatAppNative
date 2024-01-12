@@ -1,10 +1,13 @@
 package com.example.myapplication.view
 
+import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -32,13 +35,78 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.myapplication.R
 import com.example.myapplication.view.ui.theme.MyApplicationTheme
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.tasks.Task
+import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.auth.auth
 import kotlinx.coroutines.launch
 import java.net.URL
 
 class LoginActivity : ComponentActivity() {
+    lateinit var auth: FirebaseAuth
+    lateinit var GoogleSigninClient: GoogleSignInClient
+
+    public fun SigninWithGoogle(){
+        val signinIntent = GoogleSigninClient.signInIntent
+        launcher.launch(signinIntent)
+    }
+
+    private val launcher = registerForActivityResult(ActivityResultContracts.StartActivityForResult())
+    {result->
+        if(result.resultCode == Activity.RESULT_OK){
+            val Task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+            handleResult(Task)
+        }
+
+
+    }
+
+    private fun handleResult(task: Task<GoogleSignInAccount>) {
+        if (task.isSuccessful){
+            val account:GoogleSignInAccount?=task.result
+            if (account !=null){
+
+                updateUi(account)
+            }
+        }else{
+            Toast.makeText(this, "login failed", Toast.LENGTH_SHORT).show()
+
+        }
+    }
+
+    private fun updateUi(account: GoogleSignInAccount) {
+        val credintial =GoogleAuthProvider.getCredential(account.idToken,null)
+        auth.signInWithCredential(credintial).addOnCompleteListener {it->
+            if (it.isSuccessful){
+                Toast.makeText(this, "login", Toast.LENGTH_SHORT).show()
+                val url:Intent= Intent(this,MainActivity::class.java)
+                startActivity(url)
+            }else{
+                Toast.makeText(this, "login failed", Toast.LENGTH_SHORT).show()
+
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        //google auth
+        auth = Firebase.auth
+        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestIdToken(getString(R.string.GoogleAuthID))
+            .requestEmail()
+            .build()
+        GoogleSigninClient= GoogleSignIn.getClient(this,gso)
+
+
+        // google signin finished
+
+
         setContent {
             MyApplicationTheme {
                 // A surface container using the 'background' color from the theme
@@ -56,14 +124,12 @@ class LoginActivity : ComponentActivity() {
                         //login - register  google btm
                         Button(
                             onClick = {
-                                val url:Intent= Intent(this@LoginActivity,MainActivity::class.java)
-                                startActivity(url)
-
+                                SigninWithGoogle()
                             },
                             modifier = Modifier
                                 .width(100.dp)
                                 .height(100.dp)
-                            
+
                             ) {
                             Image(
                                 painter = painterResource(id = R.drawable.google),

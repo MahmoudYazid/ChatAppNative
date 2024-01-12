@@ -27,16 +27,22 @@ import com.example.myapplication.ui.theme.MyApplicationTheme
 import com.example.myapplication.view.TitleRow.Composeable_MymsgsBox
 import com.example.myapplication.view.TitleRow.PeopleScroller
 import com.example.myapplication.view.TitleRow.TitleRowCompose
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.firebase.auth.FirebaseAuth
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        lateinit var auth: FirebaseAuth
+        lateinit var GoogleSigninClient: GoogleSignInClient
         super.onCreate(savedInstanceState)
+
         setContent {
             MyApplicationTheme {
                 Scaffold(
                     floatingActionButton = {
                         FloatingActionButton(onClick = {
-
+                            auth.signOut()
+                            GoogleSigninClient.signOut()
                            finish()
                         }) {
                             Icon(imageVector = Icons.Rounded.ExitToApp, contentDescription ="" )
