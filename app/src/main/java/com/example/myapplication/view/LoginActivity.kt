@@ -19,21 +19,16 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material3.Button
-import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.myapplication.R
+import com.example.myapplication.ViewModel.ViewModelClass
+import com.example.myapplication.model.user
 import com.example.myapplication.view.ui.theme.MyApplicationTheme
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
@@ -41,15 +36,15 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.tasks.Task
 import com.google.firebase.Firebase
+import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.auth
-import kotlinx.coroutines.launch
-import java.net.URL
 
 class LoginActivity : ComponentActivity() {
     lateinit var auth: FirebaseAuth
     lateinit var GoogleSigninClient: GoogleSignInClient
+    lateinit var ViewModelInst:ViewModelClass
 
     public fun SigninWithGoogle(){
         val signinIntent = GoogleSigninClient.signInIntent
@@ -83,8 +78,14 @@ class LoginActivity : ComponentActivity() {
         val credintial =GoogleAuthProvider.getCredential(account.idToken,null)
         auth.signInWithCredential(credintial).addOnCompleteListener {it->
             if (it.isSuccessful){
+
                 Toast.makeText(this, "login", Toast.LENGTH_SHORT).show()
+
+                ViewModelInst.AddToFireBase(account.email.toString(),account.displayName.toString(),account.photoUrl.toString())
+
                 val url:Intent= Intent(this,MainActivity::class.java)
+
+
                 startActivity(url)
             }else{
                 Toast.makeText(this, "login failed", Toast.LENGTH_SHORT).show()
@@ -102,6 +103,9 @@ class LoginActivity : ComponentActivity() {
             .requestEmail()
             .build()
         GoogleSigninClient= GoogleSignIn.getClient(this,gso)
+
+        ViewModelInst=ViewModelClass(this)
+        FirebaseApp.initializeApp(this)
 
 
         // google signin finished

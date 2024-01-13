@@ -23,6 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.myapplication.ViewModel.ViewModelClass
 import com.example.myapplication.ui.theme.MyApplicationTheme
 import com.example.myapplication.view.TitleRow.Composeable_MymsgsBox
 import com.example.myapplication.view.TitleRow.PeopleScroller
@@ -35,7 +36,7 @@ class MainActivity : ComponentActivity() {
         lateinit var auth: FirebaseAuth
         lateinit var GoogleSigninClient: GoogleSignInClient
         super.onCreate(savedInstanceState)
-
+        var ViewModelClassInst:ViewModelClass=ViewModelClass(this);
         setContent {
             MyApplicationTheme {
                 Scaffold(
@@ -63,7 +64,7 @@ class MainActivity : ComponentActivity() {
                                 .background(Color(0xFF1B202D))
                         ) {
                             TitleRowCompose("People")
-                            PeopleScroller()
+                            PeopleScroller(ViewModelClassInst,this@MainActivity)
                             TitleRowCompose("Messages")
                             Composeable_MymsgsBox()
 

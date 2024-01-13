@@ -1,7 +1,9 @@
 package com.example.myapplication.view.TitleRow
 
+import android.content.Context
+import android.content.Intent
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.gestures.ScrollableState
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,26 +16,27 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Face
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
-import coil.compose.rememberImagePainter
-import com.example.myapplication.R
+import com.example.myapplication.ViewModel.ViewModelClass
+import com.example.myapplication.model.user
+import com.example.myapplication.view.ChatBox
 
 
 @Composable
-fun PeopleScroller(){
+fun PeopleScroller(Viewmodel:ViewModelClass,context:Context){
     Row (
         modifier = Modifier
             .fillMaxWidth()
@@ -48,38 +51,65 @@ fun PeopleScroller(){
 
 
     ){
-        Scroller()
+
+        Scroller(Viewmodel,context)
     }
 
 }
 
 @Composable
-fun Scroller(
+fun Scroller(Viewmodel: ViewModelClass, context: Context) {
 
-){
-    for (x in 1..10){
+    val AllData = remember {
+        mutableStateOf<MutableList<user>?>(
+            null
+        )
+    }
+    LaunchedEffect(key1 = Unit, block ={
+        AllData.value = Viewmodel.getAllUsersFromFirestore()
+
+    } )
+
+   AllData.value?.forEach{it
         Box (
+        modifier = Modifier
+            .clickable {
+                val Inent=Intent(context,ChatBox::class.java)
+                Inent.putExtra("his_username", it.username.toString(),
+                )
+                Inent.putExtra("his_img", it.img.toString(),
+                )
 
+                Inent.putExtra("his_email", it.email.toString(),
+                )
+
+
+
+
+
+
+                context.startActivity(Inent)
+            }
 
         ){
             Column(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-              Image(painter = rememberAsyncImagePainter(
-                  model = "https://s3-alpha-sig.figma.com/img/2de2/a756/35286e92de0ebf87910ac0d4e14dc961?Expires=1705881600&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=WiJtTdyY5I0P9echSbL0KwYe-6MZJYcLl04e2KePxElElv8goXCO3IM1IdhdgO12YYqSTqIJuw0Oq6AGW5efy4wCys7spQ~jWiwtu61X3Jx8L8NcPO69VK5Z3I~FcXVyKkb5k-RSIoCvPJq76SLzGztTAsK8NTJMIsSLEpNyxvhxyWKAcD-NBcrYSPpOitdVmfC6wMhh8OPjAe78aBNEaGUcAcCUyXiX8MzjzeRFmyvVIwmXwSZGmn1VwOVgd8ni3HwIz8CvS~11toG73baGlaU-EuM3wRK3IafdUSte8zmpNM15RfJbUf-oLVnfBDwKx5v37GrilkzHe2MFeJTg5w__"),
-                  contentDescription = "sss",
+                Image(painter = rememberAsyncImagePainter(
+                    model = "${it.img}"),
+                    contentDescription = "sss",
 
-                  modifier = Modifier
-                      .size(60.dp)
-                      .clip(shape = RoundedCornerShape(50.dp))
-              )
-                Text(text = "name",
+                    modifier = Modifier
+                        .size(60.dp)
+                        .clip(shape = RoundedCornerShape(50.dp))
+                )
+                Text(text = "${it.username}",
                     color = Color.White,
                     fontWeight = FontWeight.W400,
                     fontSize = 16.sp)
             }
-            
+
         }
         //spacing box
         Box (
@@ -88,7 +118,9 @@ fun Scroller(
         ){
 
         }
-  
-
     }
+
+
+
+
 }
