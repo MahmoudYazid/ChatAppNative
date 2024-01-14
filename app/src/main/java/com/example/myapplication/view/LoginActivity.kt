@@ -81,7 +81,7 @@ class LoginActivity : ComponentActivity() {
 
                 Toast.makeText(this, "login", Toast.LENGTH_SHORT).show()
 
-                ViewModelInst.AddToFireBase(account.email.toString(),account.displayName.toString(),account.photoUrl.toString())
+                ViewModelInst.AddToFireBase(account.email.toString(),account.displayName.toString(),account.photoUrl.toString(),account.id.toString())
 
                 val url:Intent= Intent(this,MainActivity::class.java)
 

@@ -82,7 +82,8 @@ fun Scroller(Viewmodel: ViewModelClass, context: Context) {
 
                 Inent.putExtra("his_email", it.email.toString(),
                 )
-
+                Inent.putExtra("his_id", it.id.toString(),
+                )
 
 
 
