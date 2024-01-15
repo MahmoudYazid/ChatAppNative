@@ -185,14 +185,15 @@ fun TalkToWhoPart(PartnerName: String, PartnerImg: String) {
 fun MsgsColumn(Viewmodel: ViewModelClass) {
 
     val AllData = remember {
-        mutableStateOf<MutableList<msgsDataClass>?>(
-            null
-        )
+        mutableStateOf<MutableList<msgsDataClass>?>(null)
     }
-    LaunchedEffect(key1 = Unit, block = {
-        AllData.value = Viewmodel.getmsgsFromFirestore()
 
-    })
+    LaunchedEffect(key1 = Unit) {
+        Viewmodel.getmsgsFromFirestore { updatedList ->
+            AllData.value = updatedList
+
+        }
+    }
 
     Column(
         modifier =
