@@ -51,8 +51,7 @@ fun Composeable_MymsgsBox(){
     LaunchedEffect(key1 = Unit) {
         Viewmodel.getRealtimeMyChatsFromFirestore { updatedList ->
             AllData.value = updatedList
-            // Handle updated list in your UI or ViewModel
-            // e.g., update your RecyclerView adapter with the new data
+
         }
     }
 

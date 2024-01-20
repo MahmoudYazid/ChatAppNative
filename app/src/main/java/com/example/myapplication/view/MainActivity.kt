@@ -44,7 +44,8 @@ class MainActivity : ComponentActivity() {
                         FloatingActionButton(onClick = {
                             auth.signOut()
                             GoogleSigninClient.signOut()
-                           finish()
+
+                            finish()
                         }) {
                             Icon(imageVector = Icons.Rounded.ExitToApp, contentDescription ="" )
                         }

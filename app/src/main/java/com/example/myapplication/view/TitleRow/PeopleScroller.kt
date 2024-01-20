@@ -33,6 +33,8 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.myapplication.ViewModel.ViewModelClass
 import com.example.myapplication.model.user
 import com.example.myapplication.view.ChatBox
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
 
 
 @Composable
@@ -65,6 +67,8 @@ fun Scroller(Viewmodel: ViewModelClass, context: Context) {
             null
         )
     }
+
+
     LaunchedEffect(key1 = Unit, block ={
         AllData.value = Viewmodel.getAllUsersFromFirestore()
 

@@ -5,15 +5,25 @@ plugins {
 }
 
 android {
+    signingConfigs {
+        create("release") {
+            storeFile = file("C:\\Users\\ahmed\\Desktop\\GIT\\ChatAppNative\\key\\chatme.jks")
+            storePassword = "mnimai21yo"
+            keyAlias = "key0"
+            keyPassword = "mnimai21yo"
+        }
+    }
     namespace = "com.example.myapplication"
     compileSdk = 34
-
+    lint {
+        baseline = file("lint-baseline.xml")
+    }
     defaultConfig {
         applicationId = "com.yazid.myapplication"
         minSdk = 27
         targetSdk = 34
-        versionCode = 2
-        versionName = "2.0"
+        versionCode = 3
+        versionName = "3.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -24,10 +34,14 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = false
+            signingConfig = signingConfigs.getByName("release")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+        }
+        debug{
+         signingConfigs.getByName("release")
         }
     }
     compileOptions {
@@ -82,5 +96,6 @@ dependencies {
     implementation ("com.google.firebase:firebase-firestore-ktx:24.10.0")
 
 
+    implementation("androidx.fragment:fragment:1.6.2")
 
 }

@@ -48,6 +48,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -55,6 +57,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.lifecycleScope
 import coil.compose.rememberAsyncImagePainter
 import com.example.myapplication.R
 import com.example.myapplication.ViewModel.ViewModelClass
@@ -65,18 +68,24 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
+import kotlinx.coroutines.launch
 
 class ChatBox : ComponentActivity() {
     lateinit var GoogleSigninClient: GoogleSignInClient
     lateinit var ViewModelInst: ViewModelClass
 
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-
+        var Chatkey:String;
         val firebaseAuth = Firebase.auth
         ViewModelInst = ViewModelClass(this)
+        // if this chat dosnt exist make it
+
+
+
+
 
         setContent {
             MyApplicationTheme {
@@ -115,7 +124,8 @@ class ChatBox : ComponentActivity() {
 
 
                             ) {
-                                MsgsColumn(ViewModelInst)
+                                MsgsColumn(ViewModelInst,firebaseAuth.currentUser?.email.toString(),
+                                    intent.getStringExtra("his_email").toString())
                             }
                             Box(
                                 modifier =
@@ -182,17 +192,28 @@ fun TalkToWhoPart(PartnerName: String, PartnerImg: String) {
 
 
 @Composable
-fun MsgsColumn(Viewmodel: ViewModelClass) {
+fun MsgsColumn(Viewmodel: ViewModelClass,p1:String,p2:String) {
 
     val AllData = remember {
         mutableStateOf<MutableList<msgsDataClass>?>(null)
     }
 
-    LaunchedEffect(key1 = Unit) {
-        Viewmodel.getmsgsFromFirestore { updatedList ->
-            AllData.value = updatedList
+    var ChatId_Val_ by  remember{ mutableStateOf("") }
 
-        }
+
+    LaunchedEffect(Unit) {
+        ChatId_Val_ =  Viewmodel.getChatId(p1,p2)
+        Viewmodel.getmsgsFromFirestore(
+
+            listener = { updatedList ->
+                AllData.value = updatedList
+            },
+            Id =ChatId_Val_,
+
+
+        )
+
+
     }
 
     Column(
@@ -238,12 +259,12 @@ fun MsgsColumn(Viewmodel: ViewModelClass) {
 
                 }
             }else{
-
                 Row (
                     modifier =
                     Modifier
                         .fillMaxWidth()
-                        .wrapContentHeight(),
+                        .wrapContentHeight()
+                    ,
                     horizontalArrangement = Arrangement.Start
                 ){
 
@@ -251,12 +272,18 @@ fun MsgsColumn(Viewmodel: ViewModelClass) {
                         modifier = Modifier
                             .fillMaxHeight()
                             .clip(shape = RoundedCornerShape(50.dp))
-                            .fillMaxWidth(0.5f)
-                            .background(Color.Blue)
+                            .fillMaxWidth(0.8f)
+                            .background(Color(0xFF7A8194))
+                            .align(Alignment.CenterVertically)
+                            .padding(20.dp)
 
                     ){
-
+                        Text(text = it.msg,
+                            color = Color.White,
+                            fontWeight = FontWeight.W400,
+                            fontSize = 20.sp)
                     }
+
 
                 }
 
@@ -269,8 +296,7 @@ fun MsgsColumn(Viewmodel: ViewModelClass) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SendMsgBox(ViewModelInst: ViewModelClass, sender: String, reciever: String) {
-
-
+    val scope =LocalLifecycleOwner.current
     Row(
         modifier =
         Modifier
@@ -296,11 +322,11 @@ fun SendMsgBox(ViewModelInst: ViewModelClass, sender: String, reciever: String) 
                 Icon(imageVector = Icons.Filled.Send, contentDescription = "dddd",
                     tint = Color(0xFF9398A7),
                     modifier = Modifier.clickable {
-                        ViewModelInst.SendMsg(
-                            msgInput = text.toString(),
-                            sender = sender,
-                            reciever = reciever
-                        )
+                        scope.lifecycleScope.launch {
+                            ViewModelInst.SendMsg(msg = text.toString(), Sender = sender, Reciever = reciever )
+
+                        }
+
                     }
 
                 )
