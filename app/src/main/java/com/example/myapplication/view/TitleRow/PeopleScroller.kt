@@ -2,6 +2,7 @@ package com.example.myapplication.view.TitleRow
 
 import android.content.Context
 import android.content.Intent
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -15,7 +16,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -25,6 +30,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -39,6 +46,17 @@ import com.google.firebase.auth.auth
 
 @Composable
 fun PeopleScroller(Viewmodel:ViewModelClass,context:Context){
+    val usersList = remember {
+        mutableStateOf<MutableList<user>?>(
+            null
+        )
+    }
+
+
+    LaunchedEffect(key1 = Unit, block ={
+        usersList.value = Viewmodel.getAllUsersFromFirestore()
+
+    } )
     Row (
         modifier = Modifier
             .fillMaxWidth()
@@ -54,40 +72,28 @@ fun PeopleScroller(Viewmodel:ViewModelClass,context:Context){
 
     ){
 
-        Scroller(Viewmodel,context)
+        usersList.value?.forEach {
+            Item(Viewmodel,context,it.email.toString())
+
+        }
     }
 
 }
 
 @Composable
-fun Scroller(Viewmodel: ViewModelClass, context: Context) {
-
-    val AllData = remember {
-        mutableStateOf<MutableList<user>?>(
-            null
-        )
-    }
+fun Item(Viewmodel: ViewModelClass, context: Context,Email:String) {
 
 
-    LaunchedEffect(key1 = Unit, block ={
-        AllData.value = Viewmodel.getAllUsersFromFirestore()
 
-    } )
 
-   AllData.value?.forEach{it
         Box (
         modifier = Modifier
             .clickable {
                 val Inent=Intent(context,ChatBox::class.java)
-                Inent.putExtra("his_username", it.username.toString(),
-                )
-                Inent.putExtra("his_img", it.img.toString(),
+
+                Inent.putExtra("his_email", Email.toString(),
                 )
 
-                Inent.putExtra("his_email", it.email.toString(),
-                )
-                Inent.putExtra("his_id", it.id.toString(),
-                )
 
 
 
@@ -101,15 +107,16 @@ fun Scroller(Viewmodel: ViewModelClass, context: Context) {
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Image(painter = rememberAsyncImagePainter(
-                    model = "${it.img}"),
-                    contentDescription = "sss",
-
-                    modifier = Modifier
+                val userImage: Unit =
+                Icon(
+                    imageVector = Icons.Filled.AccountCircle,
+                    contentDescription ="ss",
+                    tint = Color.White
+                    ,modifier = Modifier
                         .size(60.dp)
-                        .clip(shape = RoundedCornerShape(50.dp))
-                )
-                Text(text = "${it.username}",
+                        .clip(shape = CircleShape))
+
+                Text(text = Email.toString(),
                     color = Color.White,
                     fontWeight = FontWeight.W400,
                     fontSize = 16.sp)
@@ -123,7 +130,7 @@ fun Scroller(Viewmodel: ViewModelClass, context: Context) {
         ){
 
         }
-    }
+
 
 
 

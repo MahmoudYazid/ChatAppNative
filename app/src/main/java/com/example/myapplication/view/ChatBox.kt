@@ -23,10 +23,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -71,7 +73,6 @@ import com.google.firebase.auth.auth
 import kotlinx.coroutines.launch
 
 class ChatBox : ComponentActivity() {
-    lateinit var GoogleSigninClient: GoogleSignInClient
     lateinit var ViewModelInst: ViewModelClass
 
 
@@ -96,12 +97,7 @@ class ChatBox : ComponentActivity() {
                 ) {
                     Box {
                         Column {
-//                            Text(text = firebaseAuth.currentUser?.displayName.toString())
-//                            Text(text = "${intent.getStringExtra("his_username")}")
-//
-//                            TalkToWhoPart(intent.getStringExtra("his_username").toString(),intent.getStringExtra("his_img").toString())
-//                            MsgsColumn()
-//                            SendMsgBox()
+
 
                             Box(
                                 modifier =
@@ -112,8 +108,7 @@ class ChatBox : ComponentActivity() {
 
                             ) {
                                 TalkToWhoPart(
-                                    intent.getStringExtra("his_username").toString(),
-                                    intent.getStringExtra("his_img").toString()
+                                    intent.getStringExtra("his_email").toString(),
                                 )
                             }
                             Box(
@@ -157,7 +152,7 @@ class ChatBox : ComponentActivity() {
 
 // part1
 @Composable
-fun TalkToWhoPart(PartnerName: String, PartnerImg: String) {
+fun TalkToWhoPart(PartnerName: String) {
 
     Row(
         modifier = Modifier
@@ -168,15 +163,13 @@ fun TalkToWhoPart(PartnerName: String, PartnerImg: String) {
         horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Image(
-            painter = rememberAsyncImagePainter(
-                model = "${PartnerImg}"
-            ),
-            contentDescription = "sss",
-
-            modifier = Modifier
-                .size(50.dp)
-                .clip(shape = RoundedCornerShape(80.dp))
+        Icon(
+            imageVector = Icons.Filled.AccountCircle,
+            contentDescription ="ss",
+            tint = Color.White
+            ,modifier = Modifier
+                .size(60.dp)
+                .clip(shape = CircleShape)
         )
 
 

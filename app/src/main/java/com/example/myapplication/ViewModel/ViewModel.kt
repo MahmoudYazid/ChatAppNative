@@ -34,16 +34,14 @@ class ViewModelClass(context: Context) {
 
     fun AddToFireBase(
         emailInput: String,
-        userNameInput: String,
-        imgInput: String,
-        IdOfUser: String
+
+
     ) {
 
         val newdata = HashMap<String, Any>()
         newdata["email"] = emailInput.toString()
-        newdata["username"] = userNameInput.toString()
-        newdata["img"] = imgInput.toString()
-        newdata["id"] = IdOfUser.toString()
+
+
 
         db.collection("user").whereEqualTo("email", emailInput).get()
             .addOnSuccessListener { documents ->
@@ -98,13 +96,12 @@ class ViewModelClass(context: Context) {
 
         collection.get().await().forEach { querySnapshot ->
             val email = querySnapshot.getString("email") ?: ""
-            val username = querySnapshot.getString("username") ?: ""
-            val img_ = querySnapshot.getString("img") ?: ""
-            val id_ = querySnapshot.getString("id") ?: ""
-            listOfData.add(user(email = email, username = username, img = img_, id = id_))
+
+            listOfData.add(user(email = email))
 
 
         }
+
         return listOfData
 
     }
@@ -141,11 +138,9 @@ class ViewModelClass(context: Context) {
                             ).get().addOnSuccessListener { userDocuments ->
                                 for (userDocument in userDocuments.documents) {
                                     val email = userDocument.getString("email") ?: ""
-                                    val username = userDocument.getString("username") ?: ""
-                                    val img_ = userDocument.getString("img") ?: ""
-                                    val id_ = userDocument.getString("id") ?: ""
-                                    if (!listOfData.contains(user(email = email, username = username, img = img_, id = id_))) {
-                                        listOfData.add(user(email = email, username = username, img = img_, id = id_))
+
+                                    if (!listOfData.contains(user(email = email))) {
+                                        listOfData.add(user(email = email))
                                     }
 
 
